@@ -1,0 +1,569 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<SCRIPT LANGUAGE="JavaScript">
+function showFilled(Value) {
+return (Value > 9) ? "" + Value : "0" + Value;
+}
+function StartClock24() {
+TheTime = new Date;
+document.clock.showTime.value = showFilled(TheTime.getHours()) + ":" + showFilled(TheTime.getMinutes()) + ":" + showFilled(TheTime.getSeconds());
+setTimeout("StartClock24()",1000)
+}
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>HTML Editor</title>
+<style type="text/css">
+body:before {
+    content: "";
+    position: fixed;
+    top: -7px;
+    left: 0;
+    width: 100%;
+    height: 7px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,.8);
+    z-index: 100;
+}
+a {color:#CC3333;text-decoration:none;font-weight:bold;font-size:11px;}
+a:hover, a:visited {color:#00f;text-decoration:underline}
+.bbn {color:#555;font-size:12px;}
+.b2n {font-family: Verdana, Geneva, sans-serif;font-size:9px;color:#000;}
+.h {color:#0080ff;}
+#hcr {position:fixed;right:5px;bottom:-410px;z-index:+1000;}
+* html #hcr {position:relative;}
+.hcrtab {height:32px;width:255px;bottom:0px;float:top;cursor:pointer;}
+.hcrcontent {float:bottom;border:2px solid #500;background:#debe94;padding:0px;}
+button {border:none}
+</style>
+<script type='text/javascript'>
+    //<![CDATA[
+    var rate = 50;
+
+    if (document.getElementById) window.onerror = new Function("return true")
+
+    var objActive; // The object which event occured in
+    var act = 0; // Flag during the action
+    var elmH = 0; // Hue
+    var elmS = 128; // Saturation
+    var elmV = 255; // Value
+    var clrOrg; // A color before the change
+    var TimerID; // Timer ID
+    if (document.all) {
+        document.onmouseover = doRainbowAnchor;
+        document.onmouseout = stopRainbowAnchor;
+    } else if (document.getElementById) {
+        document.captureEvents(Event.MOUSEOVER | Event.MOUSEOUT);
+        document.onmouseover = Mozilla_doRainbowAnchor;
+        document.onmouseout = Mozilla_stopRainbowAnchor;
+    }
+
+    function doRainbow(obj) {
+        if (act == 0) {
+            act = 1;
+            if (obj) objActive = obj;
+            else
+            objActive = event.srcElement;
+            clrOrg = objActive.style.color;
+            TimerID = setInterval("ChangeColor()", 100);
+        }
+    }
+
+
+    function stopRainbow() {
+        if (act) {
+            objActive.style.color = clrOrg;
+            clearInterval(TimerID);
+            act = 0;
+        }
+    }
+
+
+    function doRainbowAnchor() {
+        if (act == 0) {
+            var obj = event.srcElement;
+            while (obj.tagName != 'A' && obj.tagName != 'BODY') {
+                obj = obj.parentElement;
+                if (obj.tagName == 'A' || obj.tagName == 'BODY') break;
+            }
+
+            if (obj.tagName == 'A' && obj.href != '') {
+                objActive = obj;
+                act = 1;
+                clrOrg = objActive.style.color;
+                TimerID = setInterval("ChangeColor()", 100);
+            }
+        }
+    }
+
+
+    function stopRainbowAnchor() {
+        if (act) {
+            if (objActive.tagName == 'A') {
+                objActive.style.color = clrOrg;
+                clearInterval(TimerID);
+                act = 0;
+            }
+        }
+    }
+
+
+    function Mozilla_doRainbowAnchor(e) {
+        if (act == 0) {
+            obj = e.target;
+            while (obj.nodeName != 'A' && obj.nodeName != 'BODY') {
+                obj = obj.parentNode;
+                if (obj.nodeName == 'A' || obj.nodeName == 'BODY') break;
+            }
+
+            if (obj.nodeName == 'A' && obj.href != '') {
+                objActive = obj;
+                act = 1;
+                clrOrg = obj.style.color;
+                TimerID = setInterval("ChangeColor()", 100);
+            }
+        }
+    }
+
+
+    function Mozilla_stopRainbowAnchor(e) {
+        if (act) {
+            if (objActive.nodeName == 'A') {
+                objActive.style.color = clrOrg;
+                clearInterval(TimerID);
+                act = 0;
+            }
+        }
+    }
+
+
+    function ChangeColor() {
+        objActive.style.color = makeColor();
+    }
+
+
+    function makeColor() {
+        // Don't you think Color Gamut to look like Rainbow?
+        // HSVtoRGB
+        if (elmS == 0) {
+            elmR = elmV;
+            elmG = elmV;
+            elmB = elmV;
+        } else {
+            t1 = elmV;
+            t2 = (255 - elmS) * elmV / 255;
+            t3 = elmH % 60;
+            t3 = (t1 - t2) * t3 / 60;
+
+            if (elmH < 60) {
+                elmR = t1;
+                elmB = t2;
+                elmG = t2 + t3;
+            } else if (elmH < 120) {
+                elmG = t1;
+                elmB = t2;
+                elmR = t1 - t3;
+            } else if (elmH < 180) {
+                elmG = t1;
+                elmR = t2;
+                elmB = t2 + t3;
+            } else if (elmH < 240) {
+                elmB = t1;
+                elmR = t2;
+                elmG = t1 - t3;
+            } else if (elmH < 300) {
+                elmB = t1;
+                elmG = t2;
+                elmR = t2 + t3;
+            } else if (elmH < 360) {
+                elmR = t1;
+                elmG = t2;
+                elmB = t1 - t3;
+            } else {
+                elmR = 0;
+                elmG = 0;
+                elmB = 0;
+            }
+        }
+
+        elmR = Math.floor(elmR).toString(16);
+        elmG = Math.floor(elmG).toString(16);
+        elmB = Math.floor(elmB).toString(16);
+        if (elmR.length == 1) elmR = "0" + elmR;
+        if (elmG.length == 1) elmG = "0" + elmG;
+        if (elmB.length == 1) elmB = "0" + elmB;
+
+        elmH = elmH + rate;
+        if (elmH >= 360) elmH = 0;
+
+        return '#' + elmR + elmG + elmB;
+    }
+
+    //]]>
+</script>
+<script type='text/javascript'>
+//<![CDATA[
+function showHidehcr(){
+var hcr = document.getElementById("hcr");
+var w = hcr.offsetHeight;
+hcr.opened ? movehcr(0, 32-w) : movehcr(22-w, 0);
+hcr.opened = !hcr.opened;
+}
+function movehcr(x0, xf){
+var hcr = document.getElementById("hcr");
+var dx = Math.abs(x0-xf) > 10 ? 5 : 1;
+var dir = xf>x0 ? 1 : -1;
+var x = x0 + dx * dir;
+hcr.style.bottom = x.toString() + "px";
+if(x0!=xf){setTimeout("movehcr("+x+", "+xf+")", 10);}
+}
+//]]>
+</script>
+</head>
+<body onLoad="StartClock24()">
+<script type="text/javascript">
+var mouse="out";
+var bName = navigator.appName;
+var bVer = parseInt(navigator.appVersion);
+var IE4 = (bName == "Microsoft Internet Explorer" && bVer >= 4);
+var click="no";
+var ghex="empty";
+var timer;
+	
+function findPosX(obj)
+{
+	var curleft = 0;
+	if (obj.offsetParent)
+	{
+		while (obj.offsetParent)
+		{
+			curleft += obj.offsetLeft
+			obj = obj.offsetParent;
+		}
+	}
+	else if (obj.x)
+		curleft += obj.x;
+		return curleft;
+}
+
+function findPosY(obj)
+{
+	var curtop = 0;
+	if (obj.offsetParent)
+	{
+		while (obj.offsetParent)
+		{
+			curtop += obj.offsetTop
+			obj = obj.offsetParent;
+		}
+	}
+	else if (obj.y)
+	curtop += obj.y;
+	return curtop;
+}		
+	
+function showtab(e,n)
+{
+	sc=n;
+	var buta = document.getElementById('cv');
+	var posx = findPosX(buta);
+	var posy = findPosY(buta);
+	var tabid = document.getElementById('tb');
+ 	tabid.style.display = "block";
+	tabid.style.position = "absolute";
+	tabid.style.left = posx+5;
+	tabid.style.top = posy+25;
+
+	if(timer)
+	    clearTimeout(timer);
+}
+
+function showval(gg,rr,bb)
+{
+	mouse="in";
+	click="no";
+	var hexid = document.getElementById('hx');
+	var hval=""+deciToHex(gg)+deciToHex(rr)+deciToHex(bb);
+	hexid.value=hval;
+	var dispid = document.getElementById('cv');
+	dispid.style.backgroundColor="#"+hval;
+			
+}
+
+function clicked(gg,rr,bb)
+{
+			
+	mouse="in";
+	click="yes";
+	var hexid = document.getElementById('hx');
+	var hval=""+deciToHex(gg)+deciToHex(rr)+deciToHex(bb);
+	hexid.value=hval;
+	var dispid = document.getElementById('cv');
+	dispid.style.backgroundColor="#"+hval;
+	var tabid = document.getElementById('tb');
+	tabid.style.display = "none";
+	ghex=hexid.value;
+			
+}
+		
+function deltab()
+{
+	timer = setTimeout('blotab()',500);
+}
+		
+function deltaba()
+{
+	mouse = "out";
+	timer = setTimeout('blotab()',500);
+}
+		
+function blotab()
+{
+	if(mouse=="out" && click=="no")
+	{
+			
+		var tabid = document.getElementById('tb');
+		tabid.style.display = "none";
+		var hexid = document.getElementById('hx');
+		hexid.value="CEFFFF";
+		var dispid = document.getElementById('cv');
+		dispid.style.backgroundColor="#CEFFFF";
+
+	}
+			
+	if(mouse=="out" && click=="yes")
+	{
+		var tabid = document.getElementById('tb');
+		tabid.style.display = "none";
+		var hexid = document.getElementById('hx').value;
+		var gg = hexid.substr(0,2);
+		var rr = hexid.substr(2,2);
+		var bb = hexid.substr(4,2);
+		var hval=""+deciToHex(gg)+deciToHex(rr)+deciToHex(bb);
+		var dispid = document.getElementById('cv');
+		dispid.style.backgroundColor="#"+hval;
+	}
+						
+	if(mouse=="out" && click=="no" && ghex != "empty")
+	{
+		var tabid = document.getElementById('tb');
+		tabid.style.display = "none";
+		var hexid = document.getElementById('hx');
+		hexid.value=ghex;
+		var dispid = document.getElementById('cv');
+		dispid.style.backgroundColor="#"+ghex;
+			
+	}
+}
+	
+function getHexNum(num)
+{
+	ar1 = new Array('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15');
+	ar2 = new Array('0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F');
+	if(num > 15)
+		return num;
+	else
+	{
+		red = ar2[num];
+		return red;
+	}
+}
+
+function deciToHex(arg)
+{
+	var res2 = 999;
+	args = arg;
+	while(args>15)
+	{
+		arg1=parseInt(args/16);
+		arg2=args%16;
+		arg2=getHexNum(arg2);
+		args=arg1;
+
+		if(res2 == 999)
+		res2=arg2.toString();
+		else
+		res2=arg2.toString()+res2.toString();
+	}
+
+	if(args < 16 && res2 != 999)
+	{
+		def = getHexNum(args);
+		res2=def+res2.toString();
+	}
+	else if(res2 == 999)
+	{
+		if(args < 16)
+			res2= getHexNum(args);
+		else
+			res2= 1;
+	}
+
+	if(res2.length == 1)
+		res2 = "0"+res2;
+		return res2;
+}
+</script>
+<table align="center">
+<tr>
+<td>
+<form action='http://www.google.com/cse' id='cse-search-box' method='get' target='_blank'>
+<input style="width: 185px;background-color: #ffa;color: #111" id='s' name='q' onblur='if (this.value == &quot;&quot;) {this.value = &quot;Type your keywords...&quot;;}' onfocus='if (this.value == &quot;Type your keywords...&quot;) {this.value = &quot;&quot;;}' type='text' value='Type your keywords...'/>
+<button type="submit">Search</button>
+<input name='cx' type='hidden' value='010449103265333969281:_1pbzcoer4w'/>
+<input name='cof' type='hidden' value='BGC:debe94;AH:center;DIV:#debe94;LH:60;LW:212;L:http://3.bp.blogspot.com/_ALuJjudg6Rg/TO5VIYN1i2I/AAAAAAAACpo/KqJzKJQy1Hg/logo.gif;S:http://beben-koben.blogspot.com;FORID:1'/>
+</form>
+</td>
+<td>
+<form style="font-size: 10px;" method="get" name="searchform" action="http://www.google.com/search" target="_blank">
+<input name="sitesearch" value="www.w3schools.com" type="hidden">
+<input style="width: 185px;background-color: #ffa;color: #111" alt="search" name="as_q" size="20" onblur="if (this.value == &quot;&quot;) {this.value = &quot;Type your keywords here...&quot;;}" onfocus="if (this.value == &quot;Type your keywords here...&quot;) {this.value = &quot;&quot;;}" type="text" value="Type your keywords here..."> 
+<button type="submit">Search</button>
+</form>
+</td>
+</tr>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
+  <td>
+<table style="width:100%;border:solid 1px #eee;padding:0;background:#eee" align="center">
+<tr><td valign="top">
+<form name="form1" method="post">
+<textarea name="code" id="code" class="bbn" style="border:solid 1px #eee;padding:5px;width:570px;height:499px;scroll:auto;font-family:'Courier New', Courier;">
+&lt;script src='script/jquery.js' type='text/javascript'&gt;&lt;/script&gt;
+
+&lt;script type='text/javascript'&gt;
+$(document).ready(function(){
+   // Your code here
+});
+&lt;/script&gt;
+
+&lt;style&gt;
+body {background: #debe94}
+&lt;/style&gt;
+
+&lt;a href="view-source:http://your-name-link.com/" target="top"&gt;View the source&lt;/a&gt;
+</textarea>
+</form>
+</td>
+<td valign="top">
+<iframe src="about:blank" name="preview" style="height:500px;width:820px;border:solid 1px #eee;padding:5px;background:#fff;scroll:auto" frameborder="0">
+</iframe>
+</td>
+</tr>
+</table>
+<button onclick="preview.document.write (document.getElementsByTagName ('TEXTAREA')[0].value); preview.document.close(); preview.focus()">
+ Preview</button>
+<button onclick="window.document.form1.code.value='';preview.document.write (document.getElementsByTagName ('TEXTAREA')[0].value); preview.document.close(); preview.focus()">
+Clear</button>
+<button type="button" onClick="window.location.href=window.location.href">Reload Page</button>
+</td>
+</tr>
+</table>
+<div>
+<center>
+<form name="colorform">
+Hexa Value: #<input name="hexval" id="hx" value="B3B3N" size="7"></input> Color Viewer: <input type="button" size="20" value="              " name="disp" id="cv" readonly onmouseover="showtab(event)"
+onmouseout="deltab()" style="background-color:#f00;border:none"></input><div id="tb" style="position:absolute;top:375px;left:585px;display:none;" onmouseout="deltaba()">
+
+<table cellpadding=2 cellspacing=0 style="border: 1px black;">
+
+<script type="text/javascript"> 
+for(i=0;i<256;i+=85)
+{
+document.write("<tr style=\"border: 1px black;\">");
+		for(j=0;j<256;j=j+51)
+		{
+			for(k=0;k<256;k=k+25.5)
+			{
+				var ii = Math.round(i);
+				var jj = Math.round(j);
+				var kk = Math.round(k);
+						
+				if(ii == 255 && jj == 255 && kk == 255)
+				{
+					document.write("<td onmouseover='showval("+ii+","+jj+","+kk+")' \
+					onclick='clicked("+ii+","+jj+","+kk+")' style='border: 0px solid black; width:8px; height: 8px; background-color: rgb("+ii+","+jj+","+kk+");'> \
+					<a href=http://beben-koben.blogspot.com style='text-decoration: none; \
+					font-family: arial, verdana, san-serif; color: blue; font-size: 10px;'>B</a></td>");
+				}else{
+ 				document.write("<td onmouseover='showval("+ii+","+jj+","+kk+")' \
+				onclick='clicked("+ii+","+jj+","+kk+")' style=\"border: 0px solid black; width:8px; height: 8px; \
+				font-size: 5px; background-color: rgb("+ii+","+jj+","+kk+");\""+"> </td>");
+				}
+			}
+			document.write("</tr><tr>");
+		}
+		document.write("</tr>");
+}
+
+// Enable the tab character onkeypress (onkeydown) inside textarea...
+function enableTab(id) {
+    var el = document.getElementById(id);
+    el.onkeydown = function(e) {
+        if (e.keyCode === 9) { // tab was pressed
+
+            // get caret position/selection
+            var val = this.value,
+                start = this.selectionStart,
+                end = this.selectionEnd;
+
+            // set textarea value to: text before caret + tab + text after caret
+            this.value = val.substring(0, start) + '\t' + val.substring(end);
+
+            // put caret at right position again
+            this.selectionStart = this.selectionEnd = start + 1;
+
+            // prevent the focus lose
+            return false;
+
+        }
+    };
+}
+
+// ... for a textarea that has an `id="my-textarea"`
+enableTab('code');
+</script>
+</table>
+</div>
+
+<script language="javascript"type="text/javascript">function test(form){if(form.text.value=="")
+alert("Masukkan kode warna seperti #000000 dikotak\nlalu tekan tombolnya coy?")
+else{document.bgColor=(""+form.text.value+"");}}</script>
+<input value="#FFF" type="text" name="text" style="" size="7" /><input type="button" name="button" value="Result" onclick="test(this.form)" style="background-color:#ffa;border:none" />
+<input onfocus="this.value='';this.style.color='#000'" id="__blogname" placeholder="url..." style="width:212px" /> <button style="background-color:#f60;border:none" onclick="window.open(document.getElementById('__blogname').value + '?m=1');">?</button>
+</form>
+</center>
+</div>
+<tr>
+  <td>
+<center><textarea style="width:35%; height: 10em; font-family:monospace" cols="30" rows="10" onkeyup="do_encode(this)" onchange="do_encode(this)"></textarea>
+<textarea style="width:35%; height: 10em; font-family:monospace" cols="30" rows="10" id="dst" onfocus="this.select()" onclick="this.select()" readonly="readonly"></textarea></center>
+</td>
+</tr>
+<form name="clock"><input style="border:none;position:fixed;color:red;top:15px;right:0" type="text" name="showTime" size="10" class="input"></form>
+<tr>
+  <td><center>
+   <span class="b2n">&#169;2010, All Rights Reserved. HTML Editor-Hacked by </span><a href="http://beben-koben.blogspot.com" onClick="window.self.location='http://ben-tools.blogspot.com'" target="otherframe">Beben Koben</a>
+  <script type="text/javascript">
+var linkster = "javascript:var%20firebug=document.createElement('script');firebug.setAttribute('src','http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js');document.body.appendChild(firebug);(function(){if(window.firebug.version){firebug.init();}else{setTimeout(arguments.callee);}})();void(firebug);";
+linkster = '<a href="' + linkster + '">Firebug</a>';
+document.write(linkster);
+</script> 
+</center></td>
+</tr>
+
+<script type="text/javascript">function $(id){ return document.getElementById(id) } var char2entity = { "'" : '&#39;', '"' : '&quot;',  '<' : '&lt;', '>' : '&gt;',  '&' : '&amp;'}; function encode_entities(str) {   var rv = '';  for (var i = 0; i < str.length; i++) {    var ch = str.charAt(i);    rv += char2entity[ch] || ch;  }   return rv;} function do_encode(e){  $('dst').value = encode_entities(e.value)}</script>
+
+<div id='hcr'>
+<div class='hcrtab' onclick='showHidehcr()'>
+</div>
+<div class='hcrcontent'>
+
+<div id="cboxdiv" style="text-align: center; line-height: 0">
+<div><iframe frameborder="0" width="350" height="305" src="" marginheight="2" marginwidth="2" scrolling="auto" allowtransparency="yes" name="cboxmain" id="cboxmain"></iframe></div>
+<div><iframe frameborder="0" width="100%" height="80" src="" marginheight="2" marginwidth="2" scrolling="no" allowtransparency="yes" name="cboxform" style="border:#ababab 1px solid;border-top:0px"></iframe></div>
+</div><br/>
+</div>
+</div>
+</body>
+</html>
